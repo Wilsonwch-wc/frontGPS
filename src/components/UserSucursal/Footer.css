@@ -1,0 +1,142 @@
+/* Footer Styles for User Sucursal */
+.user-sucursal-footer {
+  position: fixed;
+  bottom: 0;
+  left: 280px; /* Width of sidebar */
+  right: 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  z-index: 998;
+  height: 60px;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+}
+
+.footer-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+}
+
+.footer-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.footer-version {
+  font-weight: 500;
+  color: #475569;
+}
+
+.footer-separator {
+  color: #cbd5e1;
+  font-weight: bold;
+}
+
+.footer-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.online {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.offline {
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .user-sucursal-footer {
+    left: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-sucursal-footer {
+    left: 0;
+  }
+  
+  .footer-content {
+    padding: 0 16px;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+  }
+  
+  .footer-text {
+    font-size: 0.8rem;
+    text-align: center;
+  }
+  
+  .footer-info {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-sucursal-footer {
+    height: 50px;
+  }
+  
+  .footer-text {
+    font-size: 0.75rem;
+  }
+  
+  .footer-info {
+    font-size: 0.7rem;
+  }
+  
+  .footer-version,
+  .footer-separator {
+    display: none;
+  }
+}

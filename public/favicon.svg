@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo circular -->
+  <circle cx="16" cy="16" r="16" fill="#1677ff"/>
+  
+  <!-- Letras SGT -->
+  <text x="16" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">SGT</text>
+  
+  <!-- Icono de gestión/dashboard -->
+  <rect x="6" y="8" width="4" height="4" fill="white" opacity="0.8"/>
+  <rect x="12" y="6" width="4" height="6" fill="white" opacity="0.9"/>
+  <rect x="18" y="10" width="4" height="2" fill="white" opacity="0.7"/>
+  <rect x="24" y="7" width="2" height="5" fill="white" opacity="0.8"/>
+</svg>
