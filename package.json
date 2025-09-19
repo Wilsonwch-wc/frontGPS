@@ -1,11 +1,11 @@
 {
   "name": "mantis-material-free-react",
   "version": "1.6.0",
-  "homepage": "https://mantisdashboard.com/free",
+  "homepage": ".",
   "author": {
-    "name": "CodedThemes",
-    "email": "codedthemes@gmail.com",
-    "url": "https://codedthemes.com/"
+    "name": "SGT Team",
+    "email": "admin@sgt.com",
+    "url": "https://sgt.com/"
   },
   "scripts": {
     "start": "vite",

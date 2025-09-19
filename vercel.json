@@ -12,7 +12,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "https://vigilant-light-production.up.railway.app/api/$1"
+      "dest": "https://backgps-production-adbd.up.railway.app/api/$1"
     },
     {
       "src": "/(.*)",
@@ -20,6 +20,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://vigilant-light-production.up.railway.app/api"
+    "VITE_API_URL": "https://backgps-production-adbd.up.railway.app/api"
   }
 }

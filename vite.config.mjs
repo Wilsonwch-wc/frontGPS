@@ -43,7 +43,14 @@ export default defineConfig({
     }
   },
   build: {
-    target: 'esnext',
-    minify: 'esbuild'
+    target: 'es2015',
+    minify: 'esbuild',
+    outDir: 'dist',
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   }
 });
