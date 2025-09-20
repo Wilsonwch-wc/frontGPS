@@ -39,7 +39,6 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { useAuthSucursal } from '../../contexts/AuthSucursalContext';
 import MainCard from 'components/MainCard';
-import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
 import usePageTitle from '../../hooks/usePageTitle';
 import axios from 'axios';
 import { API_BASE_URL } from '../../config/api';
@@ -50,7 +49,6 @@ const ReporteControl = () => {
   const theme = useTheme();
   const { admin } = useAuthSucursal();
   const [reportes, setReportes] = useState([]);
-  const [estadisticas, setEstadisticas] = useState(null);
   const [loading, setLoading] = useState(false);
   const [filtros, setFiltros] = useState({
     fecha_inicio: '',
@@ -92,22 +90,9 @@ const ReporteControl = () => {
   // Cargar datos iniciales
   useEffect(() => {
     if (admin) {
-      cargarEstadisticas();
       cargarReportes();
     }
   }, [admin]);
-
-  const cargarEstadisticas = async () => {
-    try {
-      const response = await apiReporte.get('/estadisticas');
-      if (response.data.success) {
-        setEstadisticas(response.data.data);
-      }
-    } catch (error) {
-      console.error('Error al cargar estadísticas:', error);
-      setError('Error al cargar estadísticas');
-    }
-  };
 
   const cargarReportes = async () => {
     setLoading(true);
@@ -210,48 +195,7 @@ const ReporteControl = () => {
         </Typography>
       </Grid>
 
-      {/* Estadísticas */}
-      {estadisticas && estadisticas.resumen && (
-        <>
-          <Grid item xs={12} sm={6} md={3}>
-            <AnalyticEcommerce
-              title="Total Confirmaciones"
-              count={estadisticas.resumen.total_confirmaciones.toString()}
-              percentage={0}
-              color={theme.palette.primary.main}
-              extra={estadisticas.resumen.total_confirmaciones.toString()}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <AnalyticEcommerce
-              title="Usuarios Activos"
-              count={estadisticas.resumen.usuarios_activos.toString()}
-              percentage={0}
-              color={theme.palette.info.main}
-              extra={estadisticas.resumen.usuarios_activos.toString()}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <AnalyticEcommerce
-              title="Confirmaciones Exitosas"
-              count={estadisticas.resumen.confirmaciones_exitosas.toString()}
-              percentage={estadisticas.resumen.porcentaje_exito}
-              isLoss={false}
-              color={theme.palette.success.main}
-              extra={`${estadisticas.resumen.porcentaje_exito.toFixed(1)}%`}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <AnalyticEcommerce
-              title="Distancia Promedio"
-              count={`${estadisticas.resumen.distancia_promedio.toFixed(0)}m`}
-              percentage={0}
-              color={theme.palette.warning.main}
-              extra={`${estadisticas.resumen.distancia_promedio.toFixed(0)} metros`}
-            />
-          </Grid>
-        </>
-      )}
+
 
       {/* Filtros */}
       <Grid item xs={12}>

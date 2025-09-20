@@ -267,11 +267,41 @@ const SucursalManagement = () => {
       </Card>
 
       {/* Formulario de Sucursal */}
-      <Dialog open={openForm} onClose={handleCloseForm} maxWidth="md" fullWidth disablePortal disableEnforceFocus disableAutoFocus>
-        <DialogTitle>
+      <Dialog 
+        open={openForm} 
+        onClose={handleCloseForm} 
+        maxWidth="lg" 
+        fullWidth 
+        disablePortal 
+        disableEnforceFocus 
+        disableAutoFocus
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            boxShadow: '0 24px 48px rgba(0,0,0,0.15)',
+            overflow: 'hidden',
+            minHeight: '75vh',
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          pb: 3, 
+          pt: 4,
+          px: 4,
+          borderBottom: '2px solid', 
+          borderColor: 'divider',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          fontSize: '1.5rem',
+          fontWeight: 600,
+        }}>
+          <StoreIcon sx={{ fontSize: 32 }} />
           {isEditing ? 'Editar Sucursal' : 'Nueva Sucursal'}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ p: 4, backgroundColor: 'grey.50' }}>
           <SucursalForm
             sucursal={selectedSucursal}
             onSuccess={handleFormSuccess}

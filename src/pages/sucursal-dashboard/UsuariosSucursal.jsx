@@ -107,11 +107,11 @@ const UsuariosSucursal = () => {
 
   const handleDelete = (usuario) => {
     setSelectedUsuario(usuario);
-    setOpenDeleteDialog(true);
+    setOpenDelete(true);
   };
 
   const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
+    setOpenDelete(false);
     setSelectedUsuario(null);
   };
 
@@ -321,7 +321,7 @@ const UsuariosSucursal = () => {
 
       {/* Diálogo de Eliminación */}
       <DeleteUsuarioSucursalDialog
-        open={openDeleteDialog}
+        open={openDelete}
         usuario={selectedUsuario}
         onClose={handleCloseDeleteDialog}
         onSuccess={handleDeleteSuccess}

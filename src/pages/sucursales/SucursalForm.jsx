@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  TextField,
   Button,
+  TextField,
   Grid,
   FormControl,
-  FormControlLabel,
-  Switch,
-  Typography,
-  Alert,
-  CircularProgress,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  FormControlLabel,
+  Switch,
+  Alert,
+  CircularProgress,
+  Box,
+  Typography,
+  InputAdornment,
+  Paper,
+  Divider,
+  Stack
 } from '@mui/material';
+import {
+  Store as StoreIcon,
+  Phone as PhoneIcon,
+  Description as DescriptionIcon,
+  LocationOn as LocationIcon,
+  Category as CategoryIcon,
+  Info as InfoIcon,
+  Business as BusinessIcon,
+  Settings as SettingsIcon
+} from '@mui/icons-material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { createSucursal, updateSucursal } from '../../api/sucursales';
@@ -40,32 +54,12 @@ const validationSchema = Yup.object({
   activo: Yup.boolean()
 });
 
-const SucursalForm = ({ sucursal, onSuccess, onCancel }) => {
+const SucursalForm = ({ sucursal, onSuccess, onCancel, open, onClose }) => {
+  const [tiposSucursal, setTiposSucursal] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [tiposSucursal, setTiposSucursal] = useState([]);
-  const [loadingTipos, setLoadingTipos] = useState(true);
+
   const isEditing = !!sucursal;
-
-  // Cargar tipos de sucursales
-  useEffect(() => {
-    const loadTiposSucursal = async () => {
-      try {
-        setLoadingTipos(true);
-        const response = await getRolesSucursal();
-        if (response.success) {
-          setTiposSucursal(response.data);
-        }
-      } catch (error) {
-        console.error('Error al cargar tipos de sucursales:', error);
-        setError('Error al cargar tipos de sucursales');
-      } finally {
-        setLoadingTipos(false);
-      }
-    };
-
-    loadTiposSucursal();
-  }, []);
 
   // Valores iniciales del formulario
   const initialValues = {
@@ -73,20 +67,47 @@ const SucursalForm = ({ sucursal, onSuccess, onCancel }) => {
     descripcion: sucursal?.descripcion || '',
     direccion: sucursal?.direccion || '',
     telefono: sucursal?.telefono || '',
-    tipo_sucursal_id: sucursal?.tipo_sucursal_id || '',
+    tipo_sucursal_id: sucursal?.tipo_sucursal_id || null,
     activo: sucursal?.activo !== undefined ? sucursal.activo : true
   };
 
+  // Cargar tipos de sucursal
+  useEffect(() => {
+    const loadTiposSucursal = async () => {
+      try {
+        const response = await getRolesSucursal();
+        if (response.success) {
+          setTiposSucursal(response.data);
+        }
+      } catch (error) {
+        console.error('Error al cargar tipos de sucursal:', error);
+        setError('Error al cargar tipos de sucursal');
+      }
+    };
+
+    loadTiposSucursal();
+  }, []);
+
+  // Manejar envío del formulario
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
       setLoading(true);
       setError('');
 
+      const sucursalData = {
+        nombre: values.nombre.trim(),
+        descripcion: values.descripcion.trim(),
+        direccion: values.direccion.trim(),
+        telefono: values.telefono.trim(),
+        tipo_sucursal_id: values.tipo_sucursal_id,
+        activo: values.activo
+      };
+
       let response;
       if (isEditing) {
-        response = await updateSucursal(sucursal.id, values);
+        response = await updateSucursal(sucursal.id, sucursalData);
       } else {
-        response = await createSucursal(values);
+        response = await createSucursal(sucursalData);
       }
 
       if (response.success) {
@@ -96,18 +117,7 @@ const SucursalForm = ({ sucursal, onSuccess, onCancel }) => {
       }
     } catch (error) {
       console.error('Error al enviar formulario:', error);
-      
-      if (error.response?.status === 400) {
-        const errorMessage = error.response.data?.message || 'Datos inválidos';
-        setError(errorMessage);
-        
-        // Si el error es específico de un campo, marcarlo
-        if (errorMessage.includes('nombre')) {
-          setFieldError('nombre', errorMessage);
-        }
-      } else {
-        setError('Error al procesar la solicitud. Intente nuevamente.');
-      }
+      setError('Error al procesar la solicitud');
     } finally {
       setLoading(false);
       setSubmitting(false);
@@ -128,173 +138,311 @@ const SucursalForm = ({ sucursal, onSuccess, onCancel }) => {
         onSubmit={handleSubmit}
         enableReinitialize
       >
-        {({ errors, touched, values, setFieldValue, isSubmitting }) => (
+        {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
           <Form>
-            <Grid container spacing={3}>
+            <Stack spacing={4}>
               {/* Información Básica */}
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom color="primary">
+              <Paper 
+                elevation={2} 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 3,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1.5, 
+                    mb: 3,
+                    fontWeight: 600,
+                    color: 'primary.main'
+                  }}
+                >
+                  <InfoIcon />
                   Información Básica
                 </Typography>
-              </Grid>
+                
+                <Grid container spacing={4}>
+                  {/* Primera fila - Nombre completo */}
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name="nombre"
+                      label="Nombre de la Sucursal"
+                      value={values.nombre}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.nombre && !!errors.nombre}
+                      helperText={touched.nombre && errors.nombre}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <StoreIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          height: 56,
+                          '&:hover fieldset': {
+                            borderColor: 'primary.main',
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
 
-              <Grid item xs={12} md={6}>
-                <Field
-                  as={TextField}
-                  name="nombre"
-                  label="Nombre de la Sucursal"
-                  fullWidth
-                  variant="outlined"
-                  error={touched.nombre && !!errors.nombre}
-                  helperText={touched.nombre && errors.nombre}
-                  disabled={loading}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Field
-                  as={TextField}
-                  name="telefono"
-                  label="Teléfono"
-                  fullWidth
-                  variant="outlined"
-                  error={touched.telefono && !!errors.telefono}
-                  helperText={touched.telefono && errors.telefono}
-                  disabled={loading}
-                  placeholder="Ej: +1234567890"
-                />
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <FormControl 
-                  fullWidth 
-                  variant="outlined" 
-                  error={touched.tipo_sucursal_id && !!errors.tipo_sucursal_id}
-                  disabled={loading || loadingTipos}
-                >
-                  <InputLabel>Tipo de Sucursal</InputLabel>
-                  <Select
-                    name="tipo_sucursal_id"
-                    value={values.tipo_sucursal_id}
-                    onChange={(e) => setFieldValue('tipo_sucursal_id', e.target.value)}
-                    label="Tipo de Sucursal"
-                  >
-                    {tiposSucursal.map((tipo) => (
-                      <MenuItem key={tipo.id} value={tipo.id}>
-                        {tipo.nombre}
+                  {/* Segunda fila - Tipo de Sucursal */}
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      select
+                      name="tipo_sucursal_id"
+                      label="Tipo de Sucursal"
+                      value={values.tipo_sucursal_id || ''}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.tipo_sucursal_id && !!errors.tipo_sucursal_id}
+                      helperText={touched.tipo_sucursal_id && errors.tipo_sucursal_id}
+                      placeholder="Selecciona un tipo de sucursal"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <CategoryIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          height: 56,
+                          '&:hover fieldset': {
+                            borderColor: 'primary.main',
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="" disabled>
+                        <em>Selecciona un tipo de sucursal</em>
                       </MenuItem>
-                    ))}
-                  </Select>
-                  {touched.tipo_sucursal_id && errors.tipo_sucursal_id && (
-                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 2 }}>
-                      {errors.tipo_sucursal_id}
-                    </Typography>
-                  )}
-                </FormControl>
-              </Grid>
+                      {tiposSucursal.map((tipo) => (
+                        <MenuItem key={tipo.id} value={tipo.id}>
+                          {tipo.nombre}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
 
-              <Grid item xs={12}>
-                <Field
-                  as={TextField}
-                  name="descripcion"
-                  label="Descripción"
-                  fullWidth
-                  variant="outlined"
-                  multiline
-                  rows={3}
-                  error={touched.descripcion && !!errors.descripcion}
-                  helperText={touched.descripcion && errors.descripcion}
-                  disabled={loading}
-                  placeholder="Descripción detallada de la sucursal"
-                />
-              </Grid>
+                  {/* Tercera fila - Teléfono y Descripción */}
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      name="telefono"
+                      label="Teléfono"
+                      value={values.telefono}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.telefono && !!errors.telefono}
+                      helperText={touched.telefono && errors.telefono}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PhoneIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          height: 56,
+                          '&:hover fieldset': {
+                            borderColor: 'primary.main',
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      name="descripcion"
+                      label="Descripción"
+                      multiline
+                      rows={2}
+                      value={values.descripcion}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.descripcion && !!errors.descripcion}
+                      helperText={touched.descripcion && errors.descripcion}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1 }}>
+                            <DescriptionIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: 'primary.main',
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Paper>
 
               {/* Información de Ubicación */}
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom color="primary" sx={{ mt: 2 }}>
+              <Paper 
+                elevation={2} 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 3,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1.5, 
+                    mb: 3,
+                    fontWeight: 600,
+                    color: 'primary.main'
+                  }}
+                >
+                  <LocationIcon />
                   Información de Ubicación
                 </Typography>
-              </Grid>
 
-              <Grid item xs={12}>
-                <Field
-                  as={TextField}
-                  name="direccion"
-                  label="Dirección"
+                <TextField
                   fullWidth
-                  variant="outlined"
+                  name="direccion"
+                  label="Dirección Completa"
                   multiline
                   rows={2}
+                  value={values.direccion}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                   error={touched.direccion && !!errors.direccion}
                   helperText={touched.direccion && errors.direccion}
-                  disabled={loading}
-                  placeholder="Dirección completa de la sucursal"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1 }}>
+                        <LocationIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '&:hover fieldset': {
+                        borderColor: 'primary.main',
+                      },
+                    },
+                  }}
                 />
-              </Grid>
+              </Paper>
 
               {/* Configuración */}
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom color="primary" sx={{ mt: 2 }}>
+              <Paper 
+                elevation={2} 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 3,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1.5, 
+                    mb: 3,
+                    fontWeight: 600,
+                    color: 'primary.main'
+                  }}
+                >
+                  <SettingsIcon />
                   Configuración
                 </Typography>
-              </Grid>
 
-              <Grid item xs={12}>
-                <FormControl component="fieldset">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={values.activo}
-                        onChange={(e) => setFieldValue('activo', e.target.checked)}
-                        disabled={loading}
-                        color="primary"
-                      />
-                    }
-                    label={
-                      <Box>
-                        <Typography variant="body1">
-                          Sucursal Activa
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          {values.activo 
-                            ? 'La sucursal está activa y disponible para operaciones' 
-                            : 'La sucursal está inactiva y no disponible para operaciones'
-                          }
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                </FormControl>
-              </Grid>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      name="activo"
+                      checked={values.activo}
+                      onChange={handleChange}
+                      color="primary"
+                    />
+                  }
+                  label="Sucursal Activa"
+                  sx={{
+                    '& .MuiFormControlLabel-label': {
+                      fontWeight: 500,
+                      color: 'text.primary',
+                    },
+                  }}
+                />
+              </Paper>
+            </Stack>
 
-              {/* Botones de acción */}
-              <Grid item xs={12}>
-                <Box display="flex" justifyContent="flex-end" gap={2} sx={{ mt: 3 }}>
-                  <Button
-                    onClick={onCancel}
-                    disabled={loading}
-                    variant="outlined"
-                    sx={{ minWidth: 100 }}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={loading || isSubmitting}
-                    sx={{ minWidth: 100 }}
-                    startIcon={loading && <CircularProgress size={20} />}
-                  >
-                    {loading 
-                      ? 'Procesando...' 
-                      : isEditing 
-                        ? 'Actualizar' 
-                        : 'Crear'
-                    }
-                  </Button>
-                </Box>
-              </Grid>
-            </Grid>
+            <Divider sx={{ my: 4 }} />
+
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+               <Button
+                 variant="outlined"
+                 onClick={onCancel}
+                 disabled={isSubmitting}
+                 sx={{
+                   borderRadius: 2,
+                   px: 4,
+                   py: 1.5,
+                   textTransform: 'none',
+                   fontWeight: 500,
+                   borderWidth: 2,
+                   '&:hover': {
+                     borderWidth: 2,
+                   },
+                 }}
+               >
+                 Cancelar
+               </Button>
+               <Button
+                 type="submit"
+                 variant="contained"
+                 disabled={isSubmitting}
+                 sx={{
+                   borderRadius: 2,
+                   px: 4,
+                   py: 1.5,
+                   textTransform: 'none',
+                   fontWeight: 500,
+                   boxShadow: 3,
+                   '&:hover': {
+                     boxShadow: 6,
+                   },
+                 }}
+               >
+                 {isSubmitting ? (
+                   <CircularProgress size={20} color="inherit" />
+                 ) : (
+                   sucursal ? 'Actualizar' : 'Crear'
+                 )}
+               </Button>
+             </Box>
           </Form>
         )}
       </Formik>
